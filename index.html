@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce Website</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        #main {
+            background: linear-gradient(to bottom, rgba(195, 238, 195, 0.632), rgb(198, 209, 203), rgba(161, 184, 193, 0.645));
+            color: rgb(12, 12, 12);
+            font-family: Arial, sans-serif;
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            margin: 20px;
+            grid-gap: 20px;
+        }
+
+        #main>div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgb(53, 72, 59);
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        img {
+            width: 80%;
+            height: 220px;
+            background: none;
+        }
+
+    
+
+        #nav {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+            padding: 10px;
+        }
+
+        select {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid black;
+            background: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>E-Commerce Platform</h1>
+    <div id="nav"></div>
+    <div id="main"></div>
+</body>
+
+</html>
+
+<script>
+    let main = document.getElementById("main")
+    let nav = document.getElementById("nav")
+
+    let sort = document.createElement("select")
+    sort.innerHTML = `
+        <option value="sort">Sort</option>
+        <option value="hightolow">High-To-Low</option>
+        <option value="lowtohigh">Low-To-High</option>
+    `
+
+    let filter = document.createElement("select");
+    filter.innerHTML = `
+        <option value="">All</option>
+        <option value="electronics">Electronics</option>
+        <option value="jewelery">Jewelery</option>
+        <option value="men's clothing">Men's Clothing</option>
+        <option value="women's clothing">Women's Clothing</option>
+    `
+
+    nav.append(sort, filter)
+
+    let final_data = []
+    let original_data = []
+
+    fetch("https://fakestoreapi.com/products")
+        .then(response => response.json())
+        .then(data => {
+            final_data = [...data]; 
+            original_data = [...data]; 
+            displayProducts(final_data);
+        });
+
+    function displayProducts(products) {
+        main.innerHTML = "";
+        products.forEach(product => {
+            let div = document.createElement("div");
+            let product_img = document.createElement("img");
+            let price = document.createElement("p");
+            let title = document.createElement("h4");
+
+            product_img.src = product.image;
+            title.innerText = product.title;
+            price.innerText = `USD: ${product.price}`;
+
+            div.append(product_img, title, price);
+            main.append(div);
+        });
+    }
+
+    sort.addEventListener("change", () => {
+        if (sort.value === "hightolow") {
+            final_data.sort((a, b) => b.price - a.price);
+        } else if (sort.value === "lowtohigh") {
+            final_data.sort((a, b) => a.price - b.price);
+        } else {
+            final_data = [...original_data]; 
+        }
+        displayProducts(final_data);
+    });
+
+    filter.addEventListener("change", () => {
+        if (filter.value) {
+            final_data = original_data.filter(item => item.category === filter.value);
+        } else {
+            final_data = [...original_data];
+        }
+        displayProducts(final_data);
+    });
+
+</script>
